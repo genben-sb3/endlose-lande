@@ -1,0 +1,6 @@
+# Godot-eigene Cache-Ordner
+.godot/
+/android/
+*.tmp
+# Exporte
+/build/

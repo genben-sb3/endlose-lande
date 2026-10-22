@@ -1,0 +1,10 @@
+# Deutsche Spieltexte für „Die endlosen Lande".
+# Im Code steht nur der Schlüssel (msgid), z. B. tr("HINT_MOVE").
+# Hier steht, was der Spieler wirklich sieht (msgstr).
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "HINT_MOVE"
+msgstr "Laufen: WASD oder Pfeiltasten"

@@ -12,9 +12,20 @@ Auf Deutsch antworten, freundlich erklären, beide direkt ansprechen. Code **ein
 - **Begriffe:** siehe [`GLOSSARY.md`](GLOSSARY.md) — im Code & in Texten genau diese Wörter benutzen.
 - **Spiel-Daten** (Waffen, Gegner, Wächter, Beute-Tabellen, Preise) zentral halten, nicht im Code verstreut.
 
+## Spiel starten
+- Im Repo-Ordner: `godot` → öffnet das Spiel direkt. `godot -e` öffnet stattdessen den Editor.
+- Steuerung: WASD oder Pfeiltasten.
+- Nach dem ersten Klonen (oder neuen Dateien wie `.po`) einmal importieren: `godot --headless --import`
+
 ## Tests
-- **GUT** (Addon in `addons/gut`). Alles testen, was ein Spieler erleben würde — nicht interne Hilfsfunktionen.
-- Ohne Fenster laufen lassen: `godot --headless -s addons/gut/gut_cmdln.gd -gexit`
+- **GUT 9.7.1** (Addon in `addons/gut`). Alles testen, was ein Spieler erleben würde — nicht interne Hilfsfunktionen.
+- Alle Tests ohne Fenster: `godot --headless -s addons/gut/gut_cmdln.gd -gexit` → Exit-Code 0 = alles grün, sonst ≠ 0.
+- Eine Testdatei: `… -gselect=test_player_movement.gd -gexit`
+- Tests liegen in `test/`, heißen `test_*.gd` (Einstellungen in `.gutconfig.json`).
+- `test/test_scripts_load.gd` lädt jedes Skript — so fällt auch eine Testdatei mit Tippfehler auf (GUT würde sie sonst still überspringen).
+
+## Texte
+- Jeder Spieltext läuft über `tr("SCHLÜSSEL")`; die deutschen Texte stehen in `locale/de.po`.
 
 ## Ablauf
 Spec & Tickets liegen als GitHub Issues in diesem Repo (Label `ready-for-agent` = fertig zum Bauen).
