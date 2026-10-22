@@ -1,4 +1,4 @@
-# Wächter-Test: Jedes Skript im Projekt muss sich laden lassen.
+# Lade-Test: Jedes Skript im Projekt muss sich laden lassen.
 # GUT überspringt Testdateien mit Tippfehlern sonst still – dieser Test
 # sorgt dafür, dass der Testlauf dann rot wird (Exit-Code ≠ 0).
 extends GutTest

@@ -28,6 +28,7 @@ func _walk(keys: Array, frames := 10) -> Vector2:
 	return weg
 
 
+## Schickt einen Tastendruck (oder das Loslassen) an Godot, wie eine echte Tastatur.
 func _send_key(key: Key, pressed: bool) -> void:
 	var event := InputEventKey.new()
 	event.physical_keycode = key
