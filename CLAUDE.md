@@ -13,7 +13,9 @@ Auf Deutsch antworten, freundlich erklären, beide direkt ansprechen. Code **ein
   Vorlage: Branch `prototype/stil`, Datei `prototypes/stil/stil_vektor.gd`.
   - Dünner Umriss (~2,5 px) in einer **dunkleren Farbe der Form selbst** – kein reines Schwarz.
   - Flächen mit **Farbverlauf** hell (oben) → dunkel (unten); kleiner, klarer Glanz oben links (nur wenn er in die Form passt).
-  - **Kräftige, satte Farben**, nicht zu hell; runde, knuffige Formen; Licht von oben links, Schatten unten rechts.
+  - **Abgestimmte, freundliche Palette wie in Animal Crossing:** frisches Gelbgrün, türkises Wasser, warme
+    Holz- und Erdtöne – satt, aber nicht neon und nicht zu dunkel (Werte in `stil_vektor.gd`).
+  - Runde, knuffige Formen; Licht von oben links, Schatten unten rechts.
   - **Glatte Kanten:** Flächen glättet der Web-Renderer nicht – um jede Fläche eine geglättete Linie
     in derselben Farbe legen (`draw_polyline(…, true)`). Hintergrund: `docs/research/stil-vorbilder.md`.
   - Vorbilder: Ittle Dew 2+, CraftPix „Simple Summer" (nur anschauen, nicht übernehmen).
