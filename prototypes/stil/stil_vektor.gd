@@ -335,40 +335,55 @@ func _stumpf(fuss: Vector2) -> void:
 
 
 ## Eine Axt, die im Holz steckt. „oberflaeche" ist die Mitte der Holzoberfläche.
-## Wie bei einer echten Axt nach einem Hieb: Der Stiel zeigt schräg nach hinten oben,
-## der Kopf steht senkrecht – oben der stumpfe Nacken, unten die Klinge, deren Schneide
-## parallel zum Stiel im Holz steckt.
+## Der Axtkopf sitzt quer zum Stiel: hinten der stumpfe Nacken, vorne die gebogene Schneide,
+## die schräg ins Holz geht. Was unter der Oberfläche liegt, wird abgeschnitten.
 func _axt(oberflaeche: Vector2) -> void:
-	var d := Vector2(0.78, -0.62).normalized()  # Richtung des Stiels
-	var schnitt_y := oberflaeche.y + 3.0        # hier verschwindet die Klinge im Holz
-	var auge := oberflaeche + Vector2(-6, -16)  # wo der Stiel durch den Kopf geht
-	# Spalt im Holz zuerst, damit der Kopf darüber liegt
-	draw_line(Vector2(auge.x - 17, schnitt_y + 1), Vector2(auge.x + 20, schnitt_y + 1), RINDE[2].darkened(0.45), 3.5, true)
-	# Stiel mit Knauf
-	var quer := d.orthogonal()
-	var stiel := PackedVector2Array([auge + quer * 3.5, auge - quer * 3.5, auge + d * 68 - quer * 3, auge + d * 68 + quer * 3])
-	_form(stiel, HOLZ)
-	_form(_rund(auge + d * 68, Vector2(5, 5), 14), HOLZ)
-	# Axtkopf: x = waagrecht (entlang der Schneide), y = senkrecht nach unten
-	var form := PackedVector2Array([
-		Vector2(-6, -10), Vector2(6, -10),          # Nacken oben
-		Vector2(7, -2), Vector2(9, 3),              # Hals rechts
-		Vector2(20, 12), Vector2(22, 26),           # Klinge rechts, breiter werdend
-		Vector2(-18, 26), Vector2(-16, 12),         # Klinge links (wird unten abgeschnitten)
-		Vector2(-8, 3), Vector2(-7, -2)])           # Hals links
+	var d := Vector2(0.75, -0.66).normalized()  # Richtung des Stiels (nach oben rechts)
+	var q := Vector2(0.66, 0.75).normalized()   # quer dazu: Richtung der Schneide (ins Holz)
+	var auge := oberflaeche + Vector2(-4, -16)  # wo der Stiel durch den Kopf geht
+	var schnitt_y := oberflaeche.y + 1.0        # hier verschwindet die Schneide im Holz
+	# Axtkopf in eigenen Koordinaten: u entlang q (Schneide), v entlang d (Stiel)
+	var umriss := [Vector2(-9, -5), Vector2(2, -7.5), Vector2(8, -5.5), Vector2(19, -13)]
+	for i in 9:  # gebogene Schneide
+		var w := lerpf(-1.0, 1.0, i / 8.0)
+		umriss.append(Vector2(19 + cos(w * 1.1) * 8, w * 13))
+	umriss += [Vector2(19, 13), Vector2(8, 5.5), Vector2(2, 7.5), Vector2(-9, 5)]
 	var kopf := PackedVector2Array()
-	for p in form:
-		kopf.append(auge + p)
-	var ueber_holz := PackedVector2Array([Vector2(auge.x - 60, auge.y - 60), Vector2(auge.x + 60, auge.y - 60),
-		Vector2(auge.x + 60, schnitt_y), Vector2(auge.x - 60, schnitt_y)])
-	for teil in Geometry2D.intersect_polygons(kopf, ueber_holz):
+	for p in umriss:
+		kopf.append(auge + q * p.x + d * p.y)
+	var ueber_holz := PackedVector2Array([Vector2(auge.x - 80, auge.y - 80), Vector2(auge.x + 80, auge.y - 80),
+		Vector2(auge.x + 80, schnitt_y), Vector2(auge.x - 80, schnitt_y)])
+	var sichtbar := Geometry2D.intersect_polygons(kopf, ueber_holz)
+	# Spalt im Holz zuerst (unter dem Kopf): genau dort, wo die Schneide eintaucht
+	var links := INF
+	var rechts := -INF
+	for teil in sichtbar:
+		for p in teil:
+			if absf(p.y - schnitt_y) < 0.5:
+				links = minf(links, p.x)
+				rechts = maxf(rechts, p.x)
+	if links < rechts:
+		draw_line(Vector2(links - 4, schnitt_y + 1), Vector2(rechts + 4, schnitt_y + 1), RINDE[2].darkened(0.45), 3.5, true)
+	# Stiel mit Knauf am Ende
+	var stiel := PackedVector2Array([auge - d * 2 + q * 3.5, auge - d * 2 - q * 3.5, auge + d * 70 - q * 3, auge + d * 70 + q * 3])
+	_form(stiel, HOLZ)
+	_form(_rund(auge + d * 70, Vector2(5, 5), 14), HOLZ)
+	# Kopf
+	for teil in sichtbar:
 		_form(teil, METALL)
-	# blanker Streifen kurz über dem Holz (die geschliffene Schneide)
-	var blank := PackedVector2Array([auge + Vector2(-15, 14), auge + Vector2(19, 14), Vector2(auge.x + 21, schnitt_y - 1), Vector2(auge.x - 17, schnitt_y - 1)])
-	for teil in Geometry2D.intersect_polygons(blank, kopf):
-		draw_colored_polygon(teil, METALL[0].lightened(0.25))
-	# Loch für den Stiel im Kopf
-	draw_circle(auge, 3.2, METALL[2].darkened(0.35), true, -1.0, true)
+	# blanker Streifen entlang der Schneide – nur der Teil über dem Holz
+	var blank := PackedVector2Array()
+	for i in 9:
+		var w := lerpf(-1.0, 1.0, i / 8.0)
+		blank.append(auge + q * (19 + cos(w * 1.1) * 8) + d * (w * 13))
+	for i in 9:
+		var w := lerpf(1.0, -1.0, i / 8.0)
+		blank.append(auge + q * (17 + cos(w * 1.1) * 5) + d * (w * 10))
+	for teil in sichtbar:
+		for streifen in Geometry2D.intersect_polygons(blank, teil):
+			draw_colored_polygon(streifen, METALL[0].lightened(0.25))
+	# Loch für den Stiel
+	draw_circle(auge, 3.0, METALL[2].darkened(0.35), true, -1.0, true)
 
 
 func _pilz(fuss: Vector2, g: float) -> void:
