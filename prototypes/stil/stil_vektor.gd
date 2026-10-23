@@ -94,7 +94,7 @@ func _plateau(oben: PackedVector2Array, hoehe: float) -> void:
 		teile.append(PackedVector2Array([a, b, b + Vector2(0, hoehe), a + Vector2(0, hoehe)]))
 	_tusche = ERDWAND[2].darkened(0.4)
 	for t in teile:
-		draw_colored_polygon(Geometry2D.offset_polygon(t, UMRISS)[0], _tusche)
+		_flaeche(Geometry2D.offset_polygon(t, UMRISS)[0], _tusche)
 	for t in teile.slice(1):
 		_verlauf(t, ERDWAND[1], ERDWAND[2])
 	# Wand-Details: senkrechte dunkle Streifen und helle Ziegel-Flecken
@@ -108,8 +108,8 @@ func _plateau(oben: PackedVector2Array, hoehe: float) -> void:
 		if i % 4 == 1:
 			draw_rect(Rect2(a + Vector2(4, hoehe * 0.45), Vector2(18, 9)), ERDWAND[0])
 	# Grasfläche oben
-	draw_colored_polygon(oben, GRAS[1])
-	draw_colored_polygon(_skalieren(oben, _mitte(oben) + Vector2(-200, -120), 0.82), GRAS[0].lerp(GRAS[1], 0.55))
+	_flaeche(oben, GRAS[1])
+	_flaeche(_skalieren(oben, _mitte(oben) + Vector2(-200, -120), 0.82), GRAS[0].lerp(GRAS[1], 0.55))
 	# Gras-Kante, die über die Wand hängt (Bögen)
 	var boegen := []
 	for i in oben.size():
@@ -168,9 +168,9 @@ func _hoehleneingang(p: Vector2) -> void:
 		bogen.append(p + Vector2(cos(w) * 34, sin(w) * 40))
 	bogen.append(p + Vector2(34, 22))
 	bogen.append(p + Vector2(-34, 22))
-	draw_colored_polygon(Geometry2D.offset_polygon(bogen, UMRISS + 6)[0], STEIN[2].darkened(0.4))
-	draw_colored_polygon(Geometry2D.offset_polygon(bogen, 6)[0], STEIN[1])
-	draw_colored_polygon(bogen, Color("#1c1622"))
+	_flaeche(Geometry2D.offset_polygon(bogen, UMRISS + 6)[0], STEIN[2].darkened(0.4))
+	_flaeche(Geometry2D.offset_polygon(bogen, 6)[0], STEIN[1])
+	_flaeche(bogen, Color("#1c1622"))
 	for i in 5:  # Steine im Bogen
 		var w := PI + PI * (i + 0.5) / 5.0
 		_stein(p + Vector2(cos(w) * 40, sin(w) * 46 + 6), 9)
@@ -185,7 +185,7 @@ func _form(f: PackedVector2Array, farben: Array, mit_umriss := true) -> void:
 	var groesse := _groesse(f)
 	_tusche = farben[2].darkened(0.4)
 	if mit_umriss and UMRISS > 0.0:
-		draw_colored_polygon(Geometry2D.offset_polygon(f, UMRISS)[0], _tusche)
+		_flaeche(Geometry2D.offset_polygon(f, UMRISS)[0], _tusche)
 	_verlauf(f, farben[1].lerp(farben[0], 0.35), farben[2])
 	# Glanz oben links – aber nur, wenn er ganz in der Form liegt (bei dünnen Formen nicht)
 	var glanz_pos := m - groesse * 0.22
@@ -204,6 +204,24 @@ func _verlauf(f: PackedVector2Array, oben: Color, unten: Color) -> void:
 	for p in f:
 		farben.append(oben.lerp(unten, (p.y - r.position.y) / maxf(r.size.y, 1.0)))
 	draw_polygon(f, farben)
+	# weicher Rand: Flächen glättet Godot im Web-Renderer nicht, Linien schon
+	var ring := f.duplicate()
+	ring.append(f[0])
+	var ring_farben := farben.duplicate()
+	ring_farben.append(farben[0])
+	draw_polyline_colors(ring, ring_farben, 1.0, true)
+
+
+## Eine einfarbige Fläche mit kantengeglättetem Rand.
+## (Im Compatibility-Renderer gibt es für Flächen keine Kantenglättung, für Linien schon –
+## darum legen wir eine dünne, geglättete Linie in derselben Farbe um die Fläche.)
+func _flaeche(f: PackedVector2Array, farbe: Color) -> void:
+	if f.size() < 3:
+		return
+	draw_colored_polygon(f, farbe)
+	var ring := f.duplicate()
+	ring.append(f[0])
+	draw_polyline(ring, farbe, 1.0, true)
 
 
 func _kreis(mitte: Vector2, radius: float, oben: Color, unten: Color) -> void:
@@ -213,7 +231,7 @@ func _kreis(mitte: Vector2, radius: float, oben: Color, unten: Color) -> void:
 func _glanz(p: Vector2, r: float, farbe: Color) -> void:
 	var c := farbe
 	c.a = 0.8
-	draw_colored_polygon(_rund(p, Vector2(r * 0.8, r * 0.5), 18), c)
+	_flaeche(_rund(p, Vector2(r * 0.8, r * 0.5), 18), c)
 	draw_circle(p + Vector2(r * 1.1, r * 0.15), r * 0.2, c, true, -1.0, true)
 
 
@@ -282,7 +300,7 @@ func _truhe(fuss: Vector2) -> void:
 		fuss + Vector2(b + 2, -h - 6) + tiefe, fuss + Vector2(b + 2, -h + 2) + tiefe])
 	# Umriss außen herum, dann Füllungen
 	for f in [kasten, kasten_seite, deckel_hinten, deckel_seite, deckel]:
-		draw_colored_polygon(Geometry2D.offset_polygon(f, UMRISS)[0], HOLZ[2].darkened(0.45))
+		_flaeche(Geometry2D.offset_polygon(f, UMRISS)[0], HOLZ[2].darkened(0.45))
 	_verlauf(kasten, HOLZ[1], HOLZ[2])
 	_verlauf(kasten_seite, HOLZ[2], HOLZ[2].darkened(0.25))
 	_verlauf(deckel_hinten, HOLZ[2], HOLZ[2].darkened(0.2))
@@ -305,7 +323,7 @@ func _truhe(fuss: Vector2) -> void:
 	var schloss := _glatt(PackedVector2Array([fuss + Vector2(-8, -h - 6), fuss + Vector2(8, -h - 6), fuss + Vector2(8, -h + 10), fuss + Vector2(-8, -h + 10)]), 2)
 	_form(schloss, gold)
 	draw_circle(fuss + Vector2(0, -h + 1), 2.6, Color("#3a2a12"), true, -1.0, true)
-	draw_colored_polygon(PackedVector2Array([fuss + Vector2(-1.6, -h + 2), fuss + Vector2(1.6, -h + 2), fuss + Vector2(2.4, -h + 7), fuss + Vector2(-2.4, -h + 7)]), Color("#3a2a12"))
+	_flaeche(PackedVector2Array([fuss + Vector2(-1.6, -h + 2), fuss + Vector2(1.6, -h + 2), fuss + Vector2(2.4, -h + 7), fuss + Vector2(-2.4, -h + 7)]), Color("#3a2a12"))
 	# Glanz auf dem Deckel
 	_glanz(fuss + Vector2(-b * 0.45, -h - 18), 6, HOLZ[0].lightened(0.3))
 
@@ -317,8 +335,8 @@ func _holzstapel(fuss: Vector2) -> void:
 		var koerper := PackedVector2Array([p + Vector2(-38, -16), p + Vector2(26, -16), p + Vector2(26, 16), p + Vector2(-38, 16)])
 		_form(koerper, RINDE)
 		var ende := _rund(p + Vector2(-38, 0), Vector2(13, 16), 18)
-		draw_colored_polygon(Geometry2D.offset_polygon(ende, UMRISS)[0], RINDE[2].darkened(0.4))
-		draw_colored_polygon(ende, HOLZ[0])
+		_flaeche(Geometry2D.offset_polygon(ende, UMRISS)[0], RINDE[2].darkened(0.4))
+		_flaeche(ende, HOLZ[0])
 		draw_arc(p + Vector2(-38, 0), 8.0, 0, TAU, 16, HOLZ[1], 2.0, true)
 
 
@@ -328,8 +346,8 @@ func _stumpf(fuss: Vector2) -> void:
 		fuss + Vector2(30, -48), fuss + Vector2(34, -10), fuss + Vector2(44, 0), fuss + Vector2(12, -4), fuss + Vector2(0, 2), fuss + Vector2(-14, -4)])
 	_form(koerper, RINDE)
 	var oben := _rund(fuss + Vector2(0, -48), Vector2(31, 12), 20)
-	draw_colored_polygon(Geometry2D.offset_polygon(oben, UMRISS)[0], RINDE[2].darkened(0.4))
-	draw_colored_polygon(oben, HOLZ[0])
+	_flaeche(Geometry2D.offset_polygon(oben, UMRISS)[0], RINDE[2].darkened(0.4))
+	_flaeche(oben, HOLZ[0])
 	draw_arc(fuss + Vector2(0, -48), 16.0, 0, TAU, 20, HOLZ[1], 2.0, true)
 	_axt(fuss + Vector2(0, -48))
 
@@ -381,7 +399,7 @@ func _axt(oberflaeche: Vector2) -> void:
 		blank.append(auge + q * (17 + cos(w * 1.1) * 5) + d * (w * 10))
 	for teil in sichtbar:
 		for streifen in Geometry2D.intersect_polygons(blank, teil):
-			draw_colored_polygon(streifen, METALL[0].lightened(0.25))
+			_flaeche(streifen, METALL[0].lightened(0.25))
 	# Loch für den Stiel
 	draw_circle(auge, 3.0, METALL[2].darkened(0.35), true, -1.0, true)
 
@@ -435,17 +453,17 @@ func _figur(fuss: Vector2) -> void:
 	_form(haar, haare)
 	# Gesicht
 	for x in [-11, 11]:
-		draw_colored_polygon(_rund(fuss + Vector2(x, -62), Vector2(4.5, 6), 12), TUSCHE)
+		_flaeche(_rund(fuss + Vector2(x, -62), Vector2(4.5, 6), 12), TUSCHE)
 		draw_circle(fuss + Vector2(x - 1.5, -64.5), 1.8, Color.WHITE, true, -1.0, true)
 	for x in [-20, 20]:
-		draw_colored_polygon(_rund(fuss + Vector2(x, -54), Vector2(5, 3), 10), Color(1, 0.45, 0.5, 0.45))
+		_flaeche(_rund(fuss + Vector2(x, -54), Vector2(5, 3), 10), Color(1, 0.45, 0.5, 0.45))
 	draw_arc(fuss + Vector2(0, -55), 4.0, 0.3, PI - 0.3, 8, TUSCHE, 2.5, true)
 
 
 # ---- Helfer ----------------------------------------------------------------------
 
 func _schatten(mitte: Vector2, radien: Vector2) -> void:
-	draw_colored_polygon(_rund(mitte, radien, 20), Color(0.15, 0.3, 0.12, 0.25))
+	_flaeche(_rund(mitte, radien, 20), Color(0.15, 0.3, 0.12, 0.25))
 
 
 func _rund(mitte: Vector2, radien: Vector2, ecken: int) -> PackedVector2Array:
