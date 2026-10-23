@@ -9,4 +9,7 @@ for s in 1 2 3; do
 	godot --display-driver x11 --rendering-driver opengl3 -s prototypes/stil/aufnahme.gd -- stil=$s "$(realpath build/stil)/stil_$s.png" 2>&1 | grep -E "SCRIPT ERROR" || true
 done
 godot --display-driver x11 --rendering-driver opengl3 -s prototypes/stil/aufnahme.gd -- stil=1 nacht "$(realpath build/stil)/stil_1_nacht.png" 2>&1 | grep -E "SCRIPT ERROR" || true
+for n in "" nacht; do
+	godot --display-driver x11 --rendering-driver opengl3 -s prototypes/stil/aufnahme.gd -- detail $n "$(realpath build/stil)/detail${n:+_$n}.png" 2>&1 | grep -E "SCRIPT ERROR" || true
+done
 ls build/stil
