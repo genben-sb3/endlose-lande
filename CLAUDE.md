@@ -23,6 +23,10 @@ Auf Deutsch antworten, freundlich erklären, beide direkt ansprechen. Code **ein
 - Was dabei passiert (wie lange welche Taste gedrückt wird), steht in `tools/screenshot.gd`.
 - Nach jedem Ticket, das man sehen kann: Screenshots machen und Ben/Luca zeigen.
 
+## Web-Version
+- `tools/export_web.sh` → baut nach `build/web/` (Vorlagen in `~/.local/share/godot/export_templates/4.7.2.stable/`, nur die Web-Vorlagen sind installiert).
+- Ohne Threads exportiert → läuft in jedem Browser, der Server braucht keine besonderen Header.
+
 ## Tests
 - **GUT 9.7.1** (Addon in `addons/gut`). Alles testen, was ein Spieler erleben würde — nicht interne Hilfsfunktionen.
 - Alle Tests ohne Fenster: `godot --headless -s addons/gut/gut_cmdln.gd -gexit` → Exit-Code 0 = alles grün, sonst ≠ 0.

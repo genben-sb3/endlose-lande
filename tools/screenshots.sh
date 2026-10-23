@@ -15,5 +15,6 @@ if [ ! -S /tmp/.X11-unix/X42 ]; then
 	sleep 2
 fi
 
-mkdir -p "$OUT"
+mkdir -p "$OUT" build
+touch build/.gdignore
 godot --display-driver x11 --rendering-driver opengl3 -s tools/screenshot.gd -- "$(realpath "$OUT")" 2>&1 | grep gespeichert
