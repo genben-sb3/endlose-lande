@@ -41,7 +41,7 @@ func _ready() -> void:
 
 
 func _satt(c: Color) -> Color:
-	return Color.from_hsv(c.h, minf(c.s * 1.3 + 0.04, 0.72), minf(c.v * 1.02, 1.0))
+	return Color.from_hsv(c.h, minf(c.s * 1.35 + 0.06, 0.85), c.v * 0.86)
 
 
 func _draw() -> void:
@@ -187,7 +187,12 @@ func _form(f: PackedVector2Array, farben: Array, mit_umriss := true) -> void:
 	if mit_umriss and UMRISS > 0.0:
 		draw_colored_polygon(Geometry2D.offset_polygon(f, UMRISS)[0], _tusche)
 	_verlauf(f, farben[1].lerp(farben[0], 0.35), farben[2])
-	_glanz(m - groesse * 0.22, groesse.x * 0.16, farben[0])
+	# Glanz oben links – aber nur, wenn er ganz in der Form liegt (bei dünnen Formen nicht)
+	var glanz_pos := m - groesse * 0.22
+	var glanz_r := minf(groesse.x, groesse.y) * 0.18
+	var innen := Geometry2D.offset_polygon(f, -glanz_r)
+	if innen.size() > 0 and Geometry2D.is_point_in_polygon(glanz_pos, innen[0]):
+		_glanz(glanz_pos, glanz_r, farben[0])
 
 
 ## Füllt eine Form mit einem senkrechten Farbverlauf (wie ein SVG-„linearGradient").
@@ -297,11 +302,23 @@ func _stumpf(fuss: Vector2) -> void:
 	draw_colored_polygon(Geometry2D.offset_polygon(oben, UMRISS)[0], RINDE[2].darkened(0.4))
 	draw_colored_polygon(oben, HOLZ[0])
 	draw_arc(fuss + Vector2(0, -48), 16.0, 0, TAU, 20, HOLZ[1], 2.0, true)
-	# Axt im Stumpf
-	var stiel := PackedVector2Array([fuss + Vector2(-6, -52), fuss + Vector2(2, -56), fuss + Vector2(42, -92), fuss + Vector2(34, -96)])
+	# Axt, die schräg im Stumpf steckt: die Schneide ist im Holz, Stiel zeigt nach oben rechts
+	var t := fuss + Vector2(-4, -50)  # Stelle, an der die Schneide im Holz steckt
+	var richtung := Vector2(1, -1.15).normalized()  # Richtung des Stiels
+	var quer := richtung.orthogonal()
+	var stiel := PackedVector2Array([t + quer * 4 + richtung * 6, t - quer * 4 + richtung * 6,
+		t - quer * 3.5 + richtung * 70, t + quer * 3.5 + richtung * 70])
 	_form(stiel, HOLZ)
-	var klinge := PackedVector2Array([fuss + Vector2(-18, -50), fuss + Vector2(4, -70), fuss + Vector2(-6, -86), fuss + Vector2(-30, -72)])
-	_form(klinge, METALL)
+	# Axtkopf: hinten schmal am Stiel, vorne eine breite, gebogene Schneide (zeigt ins Holz)
+	var kopf := PackedVector2Array()
+	kopf.append(t + richtung * 22 + quer * 6)
+	kopf.append(t + richtung * 22 - quer * 6)
+	for i in 9:  # gebogene Schneide
+		var w := lerpf(-0.9, 0.9, i / 8.0)
+		kopf.append(t + richtung * 2 + (-quer * cos(w) * 0 + quer * sin(w) * 15) - richtung * cos(w) * 8)
+	_form(kopf, METALL)
+	draw_line(t + richtung * 4 + quer * 11, t + richtung * 4 - quer * 11, METALL[0], 2.0, true)  # blanke Schneide
+	draw_line(t + quer * 14 - richtung * 2, t - quer * 14 - richtung * 2, RINDE[2].darkened(0.3), 3.0, true)  # Spalt im Holz
 
 
 func _pilz(fuss: Vector2, g: float) -> void:
