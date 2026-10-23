@@ -32,7 +32,7 @@ _Avoid_: Overworld, Karte
 Die Zahl, aus der die ganze Oberwelt berechnet wird. Gleicher Seed → gleiche Welt. Jedes neue Spiel bekommt einen zufälligen Seed.
 
 **Kachel**:
-Ein Feld der Oberwelt (48 × 48 Pixel): Gras, Baum, Wasser oder Felsen.
+Ein Feld der Oberwelt (48 × 48 Pixel): Gras, Baum, Wasser oder Fels.
 _Avoid_: Tile (im Spieltext), Feld
 
 **Zelle**:
@@ -40,7 +40,11 @@ Ein Stück Oberwelt aus 22 × 22 Kacheln. Zellen werden um den Spieler herum gel
 _Avoid_: Chunk
 
 **Biom**:
-Die Landschaftsart an einer Stelle der Oberwelt: Wiese, Ebene, Wald, Felsen oder See.
+Die Landschaftsart an einer Stelle der Oberwelt: Wiese, Ebene, Wald, Felsland oder See.
+Nicht verwechseln: **Felsland** ist das Biom, ein **Fels** ist eine einzelne Kachel darin.
+
+**Pflanze**:
+Etwas Essbares, das in der Oberwelt wächst und eingesammelt werden kann: eine Beere oder ein Pilz.
 
 **Kampfraum**:
 Ein Raum im Dungeon, dessen Tür sich erst öffnet, wenn alle Gegner darin besiegt sind.

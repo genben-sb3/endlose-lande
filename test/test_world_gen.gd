@@ -46,3 +46,26 @@ func test_startpunkt_ist_begehbar() -> void:
 		# Man soll auch losgehen können, nicht eingesperrt sein.
 		for nachbar in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
 			assert_true(gen.is_walkable(start + nachbar), "Seed %d: Nachbar frei" % seed_value)
+
+
+## Alle Biome in einem Quadrat um den Ursprung, als Liste.
+func _biomes(gen: WorldGen, radius := 40) -> Array:
+	var biomes := []
+	for y in range(-radius, radius):
+		for x in range(-radius, radius):
+			biomes.append(gen.biome_at(Vector2i(x, y)))
+	return biomes
+
+
+func test_gleicher_seed_gibt_gleiche_biome() -> void:
+	assert_eq(_biomes(WorldGen.new(1234)), _biomes(WorldGen.new(1234)))
+	assert_ne(_biomes(WorldGen.new(1234)), _biomes(WorldGen.new(98765)))
+
+
+func test_alle_biome_kommen_vor() -> void:
+	var gefunden := {}
+	for biom in _biomes(WorldGen.new(1234), 150):
+		gefunden[biom] = true
+	for biom in [WorldGen.Biome.MEADOW, WorldGen.Biome.PLAINS, WorldGen.Biome.FOREST,
+			WorldGen.Biome.ROCKY, WorldGen.Biome.LAKE]:
+		assert_true(gefunden.has(biom), "Biom %s kommt vor" % WorldGen.Biome.keys()[biom])

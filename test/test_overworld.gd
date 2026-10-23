@@ -112,3 +112,26 @@ func test_jedes_neue_spiel_hat_einen_zufaelligen_seed() -> void:
 		seeds.append(neu.world_seed)
 	assert_ne(seeds[0], seeds[1])
 	assert_ne(seeds[1], seeds[2])
+
+
+func test_man_sieht_nie_ungeladene_welt() -> void:
+	await _start()
+	# Schlimmster Fall: Der Spieler steht genau in der Ecke einer Zelle.
+	var zelle_px := WorldGen.CELL_TILES * WorldGen.TILE_SIZE
+	var ecke := WorldGen.cell_of_tile(WorldGen.tile_of_position(player.position)) * zelle_px
+	player.position = Vector2(ecke) + Vector2(2, 2)
+	await wait_physics_frames(15)
+	var camera: Camera2D = player.get_node("Camera")
+	camera.reset_smoothing()
+	var sichtbar_halb := get_viewport().get_visible_rect().size / camera.zoom / 2.0
+	var geladen: Array = world.loaded_cells()
+	for punkt in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+		var bild_ecke: Vector2 = player.global_position + punkt * sichtbar_halb
+		var zelle := WorldGen.cell_of_tile(WorldGen.tile_of_position(bild_ecke))
+		assert_has(geladen, zelle, "Bild-Ecke %s ist geladen" % punkt)
+
+
+func test_kamera_ist_herausgezoomt() -> void:
+	await _start()
+	var camera: Camera2D = player.get_node("Camera")
+	assert_lt(camera.zoom.x, 1.0, "man sieht mehr von der Welt")

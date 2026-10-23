@@ -14,13 +14,20 @@ const CELL_TILES := 22
 enum Tile { GRASS, TREE, WATER, ROCK }
 enum Biome { MEADOW, PLAINS, FOREST, ROCKY, LAKE }
 
-## Grenzwerte für Höhe und Feuchte (0 bis 1). Sie bestimmen, wie viel Wasser, Wald usw. es gibt:
-## ungefähr 7 % Seen, 4 % Felsen-Gebiet, 20 % Wald und 21 % Wiese – wie in der Web-Version.
+## Grenzwerte für Höhe und Feuchte (0 bis 1). Sie bestimmen, wie viel von jedem Biom es gibt.
+## Eingestellt auf ähnliche Anteile wie in der Web-Version (nachgemessen mit Seed 1234):
+## etwa 7 % See, 4 % Felsland, 20 % Wald und 21 % Wiese, der Rest ist Ebene.
 const SEE_UNTER := 0.26
-const FELSGEBIET_UEBER := 0.735
-const FELSEN_UEBER := 0.755
+const FELSLAND_UEBER := 0.735
 const WALD_UEBER := 0.58
 const WIESE_UNTER := 0.36
+
+## Wie dicht Felsen im Felsland und Bäume im Wald stehen (0 bis 1).
+const FELS_DICHTE := 0.25
+const BAUM_DICHTE := 0.32
+## Zahlen, mit denen random_at für Felsen und Bäume je einen eigenen Zufall bekommt.
+const ZUFALL_FELS := 3
+const ZUFALL_BAUM := 7
 
 ## Durch diese Kacheln kann man nicht laufen.
 const BLOCKING := [Tile.TREE, Tile.WATER, Tile.ROCK]
@@ -34,7 +41,7 @@ var _feuchte := FastNoiseLite.new()
 
 func _init(seed_value: int) -> void:
 	world_seed = seed_value
-	# Wie in der Web-Version: weiches Wert-Rauschen, 3 Schichten (große Hügel + Details)
+	# Wie in der Web-Version (fbm): weiches Wert-Rauschen, 3 Schichten (große Hügel + Details)
 	for rauschen in [_hoehe, _feuchte]:
 		rauschen.noise_type = FastNoiseLite.TYPE_VALUE
 		rauschen.fractal_type = FastNoiseLite.FRACTAL_FBM
@@ -47,16 +54,18 @@ func _init(seed_value: int) -> void:
 	_feuchte.frequency = 0.045
 
 
-## Welche Kachel liegt an dieser Stelle?
+## Welche Kachel liegt an dieser Stelle? Sie hängt vom Biom ab:
+## im See Wasser, im Felsland manchmal ein Fels, im Wald manchmal ein Baum, sonst Gras.
 func tile_at(tile: Vector2i) -> Tile:
-	var hoehe := _elevation(tile)
-	var feuchte := _moisture(tile)
-	if hoehe < SEE_UNTER:
-		return Tile.WATER
-	if hoehe > FELSEN_UEBER and random_at(tile.x * 3, tile.y * 3) < 0.35:
-		return Tile.ROCK
-	if feuchte > WALD_UEBER and random_at(tile.x * 7, tile.y * 7) < 0.32:
-		return Tile.TREE
+	match biome_at(tile):
+		Biome.LAKE:
+			return Tile.WATER
+		Biome.ROCKY:
+			if random_at(tile.x * ZUFALL_FELS, tile.y * ZUFALL_FELS) < FELS_DICHTE:
+				return Tile.ROCK
+		Biome.FOREST:
+			if random_at(tile.x * ZUFALL_BAUM, tile.y * ZUFALL_BAUM) < BAUM_DICHTE:
+				return Tile.TREE
 	return Tile.GRASS
 
 
@@ -66,7 +75,7 @@ func biome_at(tile: Vector2i) -> Biome:
 	var feuchte := _moisture(tile)
 	if hoehe < SEE_UNTER:
 		return Biome.LAKE
-	if hoehe > FELSGEBIET_UEBER:
+	if hoehe > FELSLAND_UEBER:
 		return Biome.ROCKY
 	if feuchte > WALD_UEBER:
 		return Biome.FOREST

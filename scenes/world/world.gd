@@ -5,6 +5,8 @@ extends Node2D
 const WorldCellScene := preload("res://scenes/world/world_cell.tscn")
 
 ## So viele Zellen in jede Richtung um den Spieler werden geladen (1 → 3 × 3 Zellen).
+## Muss reichen, damit man auch mit herausgezoomter Kamera keine leeren Stellen sieht
+## (das prüft test_man_sieht_nie_ungeladene_welt).
 const LOAD_RADIUS := 1
 ## Erst ab diesem Abstand wird eine Zelle wieder entladen. Der Abstand ist größer als
 ## LOAD_RADIUS, damit eine Zelle nicht dauernd lädt und entlädt, wenn man an der Grenze hin- und herläuft.
