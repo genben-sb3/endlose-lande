@@ -17,6 +17,12 @@ Auf Deutsch antworten, freundlich erklären, beide direkt ansprechen. Code **ein
 - Steuerung: WASD oder Pfeiltasten.
 - Nach dem ersten Klonen (oder neuen Dateien wie `.po`) einmal importieren: `godot --headless --import`
 
+## Screenshots (Bens Rechner ist ein Server ohne Bildschirm)
+- `tools/screenshots.sh` → Bilder in `build/screenshots/`. Das Skript startet bei Bedarf einen
+  virtuellen Bildschirm (Xvfb, ohne root in `~/.local/opt/xvfb` installiert, Display `:42`).
+- Was dabei passiert (wie lange welche Taste gedrückt wird), steht in `tools/screenshot.gd`.
+- Nach jedem Ticket, das man sehen kann: Screenshots machen und Ben/Luca zeigen.
+
 ## Tests
 - **GUT 9.7.1** (Addon in `addons/gut`). Alles testen, was ein Spieler erleben würde — nicht interne Hilfsfunktionen.
 - Alle Tests ohne Fenster: `godot --headless -s addons/gut/gut_cmdln.gd -gexit` → Exit-Code 0 = alles grün, sonst ≠ 0.

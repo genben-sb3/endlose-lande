@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/player/player_look.tscn" id="2_look"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
-radius = 11.0
+radius = 22.0
 
 [node name="Player" type="CharacterBody2D"]
 motion_mode = 1
@@ -13,7 +13,7 @@ script = ExtResource("1_player")
 [node name="Look" parent="." instance=ExtResource("2_look")]
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-position = Vector2(0, 4)
+position = Vector2(0, 8)
 shape = SubResource("CircleShape2D_body")
 
 [node name="Camera" type="Camera2D" parent="."]

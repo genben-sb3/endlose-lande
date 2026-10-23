@@ -29,8 +29,7 @@ func _draw() -> void:
 	for i in ANZAHL_FLECKEN:
 		var pos := _random_point(rng)
 		var farbe: Color = GRAS_HELL if rng.randf() < 0.5 else GRAS_DUNKEL
-		farbe.a = 0.45
-		draw_circle(pos, rng.randf_range(30, 90), farbe, true, -1.0, true)
+		_soft_circle(pos, rng.randf_range(30, 90), farbe)
 
 	# Grasbüschel: drei kleine Halme
 	for i in ANZAHL_BUESCHEL:
@@ -46,6 +45,14 @@ func _draw() -> void:
 			var winkel := TAU * blatt / 5.0
 			draw_circle(pos + Vector2.from_angle(winkel) * 3.5, 2.6, farbe, true, -1.0, true)
 		draw_circle(pos, 2.0, BLUMEN_MITTE, true, -1.0, true)
+
+
+## Ein Kreis mit weichem Rand: viele fast durchsichtige Kreise übereinander,
+## innen dichter, außen blasser.
+func _soft_circle(mitte: Vector2, radius: float, farbe: Color) -> void:
+	farbe.a = 0.07
+	for ring in 6:
+		draw_circle(mitte, radius * (1.0 - ring * 0.12), farbe, true, -1.0, true)
 
 
 ## Ein zufälliger Punkt irgendwo auf der Wiese.
