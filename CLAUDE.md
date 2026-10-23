@@ -9,6 +9,14 @@ Auf Deutsch antworten, freundlich erklären, beide direkt ansprechen. Code **ein
 - **Look:** bunt, cartoonig, Cute-Fantasy — **keine Pixelgrafik**. Alles **in Godot gezeichnet**
   (glatte Formen, weiche Schatten, Shader). Jedes Objekt ist eine eigene Szene, damit man später
   gemalte Bilder einsetzen kann, ohne den Code zu ändern.
+- **Zeichenstil „F1" (von Ben am 23.10.2026 gewählt):** Vektor-Look wie ein SVG-Bild.
+  Vorlage: Branch `prototype/stil`, Datei `prototypes/stil/stil_vektor.gd`.
+  - Dünner Umriss (~2,5 px) in einer **dunkleren Farbe der Form selbst** – kein reines Schwarz.
+  - Flächen mit **Farbverlauf** hell (oben) → dunkel (unten); kleiner, klarer Glanz oben links (nur wenn er in die Form passt).
+  - **Kräftige, satte Farben**, nicht zu hell; runde, knuffige Formen; Licht von oben links, Schatten unten rechts.
+  - **Glatte Kanten:** Flächen glättet der Web-Renderer nicht – um jede Fläche eine geglättete Linie
+    in derselben Farbe legen (`draw_polyline(…, true)`). Hintergrund: `docs/research/stil-vorbilder.md`.
+  - Vorbilder: Ittle Dew 2+, CraftPix „Simple Summer" (nur anschauen, nicht übernehmen).
 - **Begriffe:** siehe [`GLOSSARY.md`](GLOSSARY.md) — im Code & in Texten genau diese Wörter benutzen.
 - **Spiel-Daten** (Waffen, Gegner, Wächter, Beute-Tabellen, Preise) zentral halten, nicht im Code verstreut.
 
