@@ -262,23 +262,52 @@ func _busch(fuss: Vector2) -> void:
 	_glanz(fuss + Vector2(-14, -44), 7, LAUB[0])
 
 
+## Eine Schatztruhe: Kasten mit gewölbtem Deckel, Seitenwand, Metallbändern und Goldschloss.
 func _truhe(fuss: Vector2) -> void:
-	_schatten(fuss + Vector2(8, 4), Vector2(48, 12))
-	var vorn := PackedVector2Array([fuss + Vector2(-40, -44), fuss + Vector2(30, -44), fuss + Vector2(30, 0), fuss + Vector2(-40, 0)])
-	var seite := PackedVector2Array([fuss + Vector2(30, -44), fuss + Vector2(46, -56), fuss + Vector2(46, -12), fuss + Vector2(30, 0)])
-	var deckel := PackedVector2Array([fuss + Vector2(-40, -44), fuss + Vector2(-24, -56), fuss + Vector2(46, -56), fuss + Vector2(30, -44)])
-	for f in [vorn, seite, deckel]:
+	var gold := [Color("#ffe48a"), Color("#f4c23a"), Color("#c48f17")]
+	var b := 34.0   # halbe Breite
+	var h := 30.0   # Höhe des Kastens
+	var tiefe := Vector2(12, -9)  # so weit sieht man die rechte Seite
+	_schatten(fuss + Vector2(10, 3), Vector2(50, 11))
+	# Formen
+	var kasten := PackedVector2Array([fuss + Vector2(-b, -h), fuss + Vector2(b, -h), fuss + Vector2(b, 0), fuss + Vector2(-b, 0)])
+	var kasten_seite := PackedVector2Array([fuss + Vector2(b, 0), fuss + Vector2(b, -h), fuss + Vector2(b, -h) + tiefe, fuss + Vector2(b, 0) + tiefe])
+	var deckel := PackedVector2Array([fuss + Vector2(-b - 2, -h + 2), fuss + Vector2(b + 2, -h + 2)])
+	for i in 13:  # gewölbter Deckel: Bogen von rechts nach links
+		var w := lerpf(0.0, PI, i / 12.0)
+		deckel.append(fuss + Vector2(cos(w) * (b + 2), -h - 6 - sin(w) * 20))
+	# Rückseite des Deckels: dieselbe Form, nach hinten versetzt – das gibt die Tiefe
+	var deckel_hinten := _verschieben(deckel, tiefe)
+	var deckel_seite := PackedVector2Array([fuss + Vector2(b + 2, -h + 2), fuss + Vector2(b + 2, -h - 6),
+		fuss + Vector2(b + 2, -h - 6) + tiefe, fuss + Vector2(b + 2, -h + 2) + tiefe])
+	# Umriss außen herum, dann Füllungen
+	for f in [kasten, kasten_seite, deckel_hinten, deckel_seite, deckel]:
 		draw_colored_polygon(Geometry2D.offset_polygon(f, UMRISS)[0], HOLZ[2].darkened(0.45))
-	_verlauf(vorn, HOLZ[1], HOLZ[2])
-	_verlauf(seite, HOLZ[2], HOLZ[2].darkened(0.2))
+	_verlauf(kasten, HOLZ[1], HOLZ[2])
+	_verlauf(kasten_seite, HOLZ[2], HOLZ[2].darkened(0.25))
+	_verlauf(deckel_hinten, HOLZ[2], HOLZ[2].darkened(0.2))
+	_verlauf(deckel_seite, HOLZ[2], HOLZ[2].darkened(0.2))
 	_verlauf(deckel, HOLZ[0], HOLZ[1])
-	for y in [-30, -15]:  # Bretter
-		draw_line(fuss + Vector2(-40, y), fuss + Vector2(30, y), HOLZ[2], 2.5, true)
-	draw_line(fuss + Vector2(-38, -2), fuss + Vector2(28, -42), HOLZ[2], 3.0, true)
-	for e in [Vector2(-40, -44), Vector2(30, -44), Vector2(-40, 0), Vector2(30, 0)]:  # Metall-Ecken
-		var ecke := _rund(fuss + e, Vector2(7, 7), 4)
-		_form(ecke, METALL)
-	_form(_rund(fuss + Vector2(-5, -36), Vector2(6, 7), 12), [Color("#ffe58a"), Color("#f2c335"), Color("#c99a1c")])
+	# Holzbretter
+	draw_line(fuss + Vector2(-b + 2, -h * 0.5), fuss + Vector2(b - 2, -h * 0.5), HOLZ[2].darkened(0.15), 2.0, true)
+	for x in [-b * 0.55, b * 0.55]:
+		draw_line(fuss + Vector2(x, -h - 10), fuss + Vector2(x * 0.9, -h - 22), HOLZ[1].darkened(0.1), 2.0, true)
+	# dunkler Spalt zwischen Deckel und Kasten
+	draw_line(fuss + Vector2(-b - 2, -h + 2), fuss + Vector2(b + 2, -h + 2), HOLZ[2].darkened(0.5), 3.0, true)
+	# Metallbänder (über Kasten und Deckel)
+	for x in [-b * 0.62, b * 0.62]:
+		var streifen := PackedVector2Array([fuss + Vector2(x - 4, 2), fuss + Vector2(x + 4, 2), fuss + Vector2(x + 4, -h - 40), fuss + Vector2(x - 4, -h - 40)])
+		for teil in Geometry2D.intersect_polygons(streifen, kasten) + Geometry2D.intersect_polygons(streifen, deckel):
+			_verlauf(teil, METALL[0], METALL[2])
+		draw_circle(fuss + Vector2(x, -h * 0.25), 1.6, METALL[2].darkened(0.3), true, -1.0, true)  # Nieten
+		draw_circle(fuss + Vector2(x, -h * 0.75), 1.6, METALL[2].darkened(0.3), true, -1.0, true)
+	# Goldschloss mit Schlüsselloch
+	var schloss := _glatt(PackedVector2Array([fuss + Vector2(-8, -h - 6), fuss + Vector2(8, -h - 6), fuss + Vector2(8, -h + 10), fuss + Vector2(-8, -h + 10)]), 2)
+	_form(schloss, gold)
+	draw_circle(fuss + Vector2(0, -h + 1), 2.6, Color("#3a2a12"), true, -1.0, true)
+	draw_colored_polygon(PackedVector2Array([fuss + Vector2(-1.6, -h + 2), fuss + Vector2(1.6, -h + 2), fuss + Vector2(2.4, -h + 7), fuss + Vector2(-2.4, -h + 7)]), Color("#3a2a12"))
+	# Glanz auf dem Deckel
+	_glanz(fuss + Vector2(-b * 0.45, -h - 18), 6, HOLZ[0].lightened(0.3))
 
 
 func _holzstapel(fuss: Vector2) -> void:
@@ -302,23 +331,44 @@ func _stumpf(fuss: Vector2) -> void:
 	draw_colored_polygon(Geometry2D.offset_polygon(oben, UMRISS)[0], RINDE[2].darkened(0.4))
 	draw_colored_polygon(oben, HOLZ[0])
 	draw_arc(fuss + Vector2(0, -48), 16.0, 0, TAU, 20, HOLZ[1], 2.0, true)
-	# Axt, die schräg im Stumpf steckt: die Schneide ist im Holz, Stiel zeigt nach oben rechts
-	var t := fuss + Vector2(-4, -50)  # Stelle, an der die Schneide im Holz steckt
-	var richtung := Vector2(1, -1.15).normalized()  # Richtung des Stiels
-	var quer := richtung.orthogonal()
-	var stiel := PackedVector2Array([t + quer * 4 + richtung * 6, t - quer * 4 + richtung * 6,
-		t - quer * 3.5 + richtung * 70, t + quer * 3.5 + richtung * 70])
+	_axt(fuss + Vector2(0, -48))
+
+
+## Eine Axt, die im Holz steckt. „oberflaeche" ist die Mitte der Holzoberfläche.
+## Wie bei einer echten Axt nach einem Hieb: Der Stiel zeigt schräg nach hinten oben,
+## der Kopf steht senkrecht – oben der stumpfe Nacken, unten die Klinge, deren Schneide
+## parallel zum Stiel im Holz steckt.
+func _axt(oberflaeche: Vector2) -> void:
+	var d := Vector2(0.78, -0.62).normalized()  # Richtung des Stiels
+	var schnitt_y := oberflaeche.y + 3.0        # hier verschwindet die Klinge im Holz
+	var auge := oberflaeche + Vector2(-6, -16)  # wo der Stiel durch den Kopf geht
+	# Spalt im Holz zuerst, damit der Kopf darüber liegt
+	draw_line(Vector2(auge.x - 17, schnitt_y + 1), Vector2(auge.x + 20, schnitt_y + 1), RINDE[2].darkened(0.45), 3.5, true)
+	# Stiel mit Knauf
+	var quer := d.orthogonal()
+	var stiel := PackedVector2Array([auge + quer * 3.5, auge - quer * 3.5, auge + d * 68 - quer * 3, auge + d * 68 + quer * 3])
 	_form(stiel, HOLZ)
-	# Axtkopf: hinten schmal am Stiel, vorne eine breite, gebogene Schneide (zeigt ins Holz)
+	_form(_rund(auge + d * 68, Vector2(5, 5), 14), HOLZ)
+	# Axtkopf: x = waagrecht (entlang der Schneide), y = senkrecht nach unten
+	var form := PackedVector2Array([
+		Vector2(-6, -10), Vector2(6, -10),          # Nacken oben
+		Vector2(7, -2), Vector2(9, 3),              # Hals rechts
+		Vector2(20, 12), Vector2(22, 26),           # Klinge rechts, breiter werdend
+		Vector2(-18, 26), Vector2(-16, 12),         # Klinge links (wird unten abgeschnitten)
+		Vector2(-8, 3), Vector2(-7, -2)])           # Hals links
 	var kopf := PackedVector2Array()
-	kopf.append(t + richtung * 22 + quer * 6)
-	kopf.append(t + richtung * 22 - quer * 6)
-	for i in 9:  # gebogene Schneide
-		var w := lerpf(-0.9, 0.9, i / 8.0)
-		kopf.append(t + richtung * 2 + (-quer * cos(w) * 0 + quer * sin(w) * 15) - richtung * cos(w) * 8)
-	_form(kopf, METALL)
-	draw_line(t + richtung * 4 + quer * 11, t + richtung * 4 - quer * 11, METALL[0], 2.0, true)  # blanke Schneide
-	draw_line(t + quer * 14 - richtung * 2, t - quer * 14 - richtung * 2, RINDE[2].darkened(0.3), 3.0, true)  # Spalt im Holz
+	for p in form:
+		kopf.append(auge + p)
+	var ueber_holz := PackedVector2Array([Vector2(auge.x - 60, auge.y - 60), Vector2(auge.x + 60, auge.y - 60),
+		Vector2(auge.x + 60, schnitt_y), Vector2(auge.x - 60, schnitt_y)])
+	for teil in Geometry2D.intersect_polygons(kopf, ueber_holz):
+		_form(teil, METALL)
+	# blanker Streifen kurz über dem Holz (die geschliffene Schneide)
+	var blank := PackedVector2Array([auge + Vector2(-15, 14), auge + Vector2(19, 14), Vector2(auge.x + 21, schnitt_y - 1), Vector2(auge.x - 17, schnitt_y - 1)])
+	for teil in Geometry2D.intersect_polygons(blank, kopf):
+		draw_colored_polygon(teil, METALL[0].lightened(0.25))
+	# Loch für den Stiel im Kopf
+	draw_circle(auge, 3.2, METALL[2].darkened(0.35), true, -1.0, true)
 
 
 func _pilz(fuss: Vector2, g: float) -> void:
