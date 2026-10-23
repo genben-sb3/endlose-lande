@@ -3,7 +3,7 @@ extends SceneTree
 
 
 func _initialize() -> void:
-	var szene := "stil_detail" if "detail" in OS.get_cmdline_user_args() else "stil_prototyp"
+	var szene := "stil_cute" if "cute" in OS.get_cmdline_user_args() else ("stil_detail" if "detail" in OS.get_cmdline_user_args() else "stil_prototyp")
 	root.add_child(load("res://prototypes/stil/%s.tscn" % szene).instantiate())
 	_save.call_deferred()
 
