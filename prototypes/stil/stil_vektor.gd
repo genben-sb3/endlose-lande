@@ -15,17 +15,18 @@ var _tusche := TUSCHE
 const ZOOM := 1.7
 const BLICK_AUF := Vector2(760, 420)
 
-## Farben: [Glanz, Grund, Schatten]
-var GRAS := [Color("#b4e37c"), Color("#8fcf5f"), Color("#6fb04a")]
-var GRAS_HALM := Color("#5f9e3e")
-var ERDWAND := [Color("#e8b384"), Color("#d39563"), Color("#b0744a")]
-var WASSER := [Color("#c4ecfa"), Color("#7ccbea"), Color("#5bb0d8")]
-var STEIN := [Color("#d6d9dd"), Color("#a8adb4"), Color("#82878f")]
-var LAUB := [Color("#a9dc7a"), Color("#6fbf5b"), Color("#4f9b46")]
-var LAUB_DUNKEL := [Color("#8fcd73"), Color("#58a653"), Color("#3f8343")]
-var HOLZ := [Color("#d9a46b"), Color("#b57a45"), Color("#8c5a32")]
-var RINDE := [Color("#a7724c"), Color("#86563a"), Color("#68412b")]
-var METALL := [Color("#d8dde3"), Color("#9aa3ad"), Color("#6f7782")]
+## Farben: [Glanz, Grund, Schatten] – eine abgestimmte, freundliche Palette im Stil von
+## Animal Crossing: frisches Gelbgrün, türkises Wasser, warme Holz- und Erdtöne (nach Augenmaß).
+var GRAS := [Color("#c3ec8f"), Color("#93d46c"), Color("#6db457")]
+var GRAS_HALM := Color("#5aa64d")
+var ERDWAND := [Color("#e2b383"), Color("#c18c5e"), Color("#986742")]
+var WASSER := [Color("#b2f1ea"), Color("#62d1d3"), Color("#38a7bb")]
+var STEIN := [Color("#ebe7e0"), Color("#c3beb5"), Color("#99938a")]
+var LAUB := [Color("#aee27a"), Color("#66c357"), Color("#43a04a")]
+var LAUB_DUNKEL := [Color("#91d26c"), Color("#52ad50"), Color("#358844")]
+var HOLZ := [Color("#f4cb92"), Color("#d99f60"), Color("#ad7540")]
+var RINDE := [Color("#b98159"), Color("#93613f"), Color("#70472c")]
+var METALL := [Color("#eef2f6"), Color("#b3bcc7"), Color("#858f9c")]
 
 var _rng := RandomNumberGenerator.new()
 
@@ -33,15 +34,9 @@ var _rng := RandomNumberGenerator.new()
 func _ready() -> void:
 	if "ohne_umriss" in OS.get_cmdline_user_args():
 		UMRISS = 0.0
-	# Alle Farben kräftiger machen (mehr Sättigung)
-	for name in ["GRAS", "ERDWAND", "WASSER", "STEIN", "LAUB", "LAUB_DUNKEL", "HOLZ", "RINDE", "METALL"]:
-		set(name, get(name).map(_satt))
-	GRAS_HALM = _satt(GRAS_HALM)
 	queue_redraw()
 
 
-func _satt(c: Color) -> Color:
-	return Color.from_hsv(c.h, minf(c.s * 1.35 + 0.06, 0.85), c.v * 0.86)
 
 
 func _draw() -> void:
