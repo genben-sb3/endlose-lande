@@ -4,11 +4,15 @@
 # Lässt die Figur ein Stück laufen und speichert dabei Bilder.
 extends SceneTree
 
+## Mit diesem Seed wird die Welt für die Screenshots erzeugt.
+const SEED := 1234
+
 ## Welche Tasten nacheinander wie viele Bilder lang gedrückt werden.
 const SCHRITTE := [
 	["", 30],
-	["move_right", 40],
-	["move_down", 40],
+	["move_right", 90],
+	["move_down", 90],
+	["move_left", 150],
 	["", 30],
 ]
 
@@ -16,7 +20,9 @@ const SCHRITTE := [
 func _initialize() -> void:
 	var ordner: String = OS.get_cmdline_user_args()[0] if OS.get_cmdline_user_args().size() > 0 else "user://screenshots"
 	DirAccess.make_dir_recursive_absolute(ordner)
-	root.add_child(load("res://scenes/main/main.tscn").instantiate())
+	var main: Node = load("res://scenes/main/main.tscn").instantiate()
+	main.world_seed = SEED  # fester Seed → jedes Mal dieselbe Welt, damit man Bilder vergleichen kann
+	root.add_child(main)
 	_run.call_deferred(ordner)
 
 

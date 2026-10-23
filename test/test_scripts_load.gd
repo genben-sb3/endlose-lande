@@ -3,7 +3,7 @@
 # sorgt dafür, dass der Testlauf dann rot wird (Exit-Code ≠ 0).
 extends GutTest
 
-const ORDNER := ["res://scenes", "res://test"]
+const ORDNER := ["res://scenes", "res://scripts", "res://test", "res://tools"]
 
 
 func test_alle_skripte_lassen_sich_laden() -> void:

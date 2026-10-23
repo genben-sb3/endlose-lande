@@ -10,9 +10,9 @@ const AUGEN := Color("#2b2233")
 
 func _draw() -> void:
 	# Weicher Schatten am Boden
-	_ellipse(Vector2(0, 14), Vector2(15, 6), Color(0, 0, 0, 0.18))
+	Shapes.ellipse(self, Vector2(0, 14), Vector2(15, 6), Color(0, 0, 0, 0.18))
 	# Körper (Umhang)
-	_ellipse(Vector2(0, 4), Vector2(12, 13), UMHANG)
+	Shapes.ellipse(self, Vector2(0, 4), Vector2(12, 13), UMHANG)
 	# Kopf
 	draw_circle(Vector2(0, -12), 11.0, HAUT, true, -1.0, true)
 	# Haare oben auf dem Kopf
@@ -21,12 +21,3 @@ func _draw() -> void:
 	draw_circle(Vector2(-4, -12), 1.8, AUGEN, true, -1.0, true)
 	draw_circle(Vector2(4, -12), 1.8, AUGEN, true, -1.0, true)
 
-
-## Zeichnet eine gefüllte, glatte Ellipse.
-func _ellipse(mitte: Vector2, radien: Vector2, farbe: Color) -> void:
-	var punkte := PackedVector2Array()
-	for i in 32:
-		var winkel := TAU * i / 32.0
-		punkte.append(mitte + Vector2(cos(winkel) * radien.x, sin(winkel) * radien.y))
-	draw_colored_polygon(punkte, farbe)
-	draw_polyline(punkte + PackedVector2Array([punkte[0]]), farbe, 1.0, true)

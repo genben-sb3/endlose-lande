@@ -28,6 +28,20 @@ _Avoid_: Siegel, Boss-Siegel, Tor
 Die unendliche, offene Welt außerhalb von Dungeons.
 _Avoid_: Overworld, Karte
 
+**Seed**:
+Die Zahl, aus der die ganze Oberwelt berechnet wird. Gleicher Seed → gleiche Welt. Jedes neue Spiel bekommt einen zufälligen Seed.
+
+**Kachel**:
+Ein Feld der Oberwelt (48 × 48 Pixel): Gras, Baum, Wasser oder Felsen.
+_Avoid_: Tile (im Spieltext), Feld
+
+**Zelle**:
+Ein Stück Oberwelt aus 22 × 22 Kacheln. Zellen werden um den Spieler herum geladen und entladen.
+_Avoid_: Chunk
+
+**Biom**:
+Die Landschaftsart an einer Stelle der Oberwelt: Wiese, Ebene, Wald, Felsen oder See.
+
 **Kampfraum**:
 Ein Raum im Dungeon, dessen Tür sich erst öffnet, wenn alle Gegner darin besiegt sind.
 
